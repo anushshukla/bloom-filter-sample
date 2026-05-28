@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package bloomfilter;
+
+// Bloom Filter data structure optimized for transfer
+message BloomFilter {
+  // Basic metadata
+  string name = 1;
+  uint32 size = 2;
+  uint32 hash_count = 3;
+  uint32 expected_elements = 4;
+  float false_positive_rate = 5;
+  uint64 created_at = 6;
+  uint32 actual_elements = 7;
+  
+  // Core bloom filter data - only set positions (sparse representation)
+  repeated uint32 set_positions = 8;
+  
+  // Hash function parameters
+  HashParams hash_params = 9;
+}
+
+// Hash function parameters
+message HashParams {
+  uint32 size = 1;
+}
+
+// API Response wrapper
+message BloomFilterResponse {
+  bool success = 1;
+  string message = 2;
+  BloomFilter filter = 3;
+  uint32 elements_processed = 4;
+}
+
+// Search request
+message SearchRequest {
+  string element = 1;
+}
+
+// Search response
+message SearchResponse {
+  bool success = 1;
+  bool exists = 2;
+  string element = 3;
+  string filter = 4;
+}
+
+// List response
+message ListResponse {
+  bool success = 1;
+  repeated FilterSummary filters = 2;
+}
+
+// Filter summary for listing
+message FilterSummary {
+  string name = 1;
+  uint32 size = 2;
+  uint32 actual_elements = 3;
+  uint32 expected_elements = 4;
+  uint64 created_at = 5;
+}

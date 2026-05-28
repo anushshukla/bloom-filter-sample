@@ -1,0 +1,49 @@
+{
+  "test_configuration": {
+    "target_coverage": 100,
+    "test_categories": [
+      "backend",
+      "frontend", 
+      "integration",
+      "performance",
+      "coverage"
+    ],
+    "backend_tests": {
+      "bloom_filter": "backend/tests/test_bloom_filter.lua",
+      "redis_adapter": "backend/tests/test_redis_adapter.lua",
+      "redis_scripts": "backend/redis_scripts/*.lua"
+    },
+    "frontend_tests": {
+      "javascript": "frontend/script.js",
+      "html": "frontend/index.html",
+      "css": "frontend/styles.css",
+      "package": "frontend/package.json"
+    },
+    "performance_thresholds": {
+      "bloom_filter_creation": 5.0,
+      "memory_usage": 100.0
+    },
+    "coverage_requirements": {
+      "functions": 100,
+      "branches": 100,
+      "lines": 100,
+      "statements": 100
+    }
+  },
+  "test_data": {
+    "sample_files": [
+      "test_data/sample_words.txt"
+    ],
+    "test_filters": [
+      "test_filter_1",
+      "test_filter_2",
+      "performance_test"
+    ]
+  },
+  "reporting": {
+    "generate_html": true,
+    "generate_json": true,
+    "generate_txt": true,
+    "output_directory": "test_reports"
+  }
+} 

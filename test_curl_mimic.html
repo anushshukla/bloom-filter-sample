@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Curl Mimic Test</title>
+</head>
+<body>
+    <h1>Curl Mimic Test</h1>
+    <button onclick="testCurlMimic()">Test Curl Mimic</button>
+    <div id="result"></div>
+
+    <script>
+        async function testCurlMimic() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                console.log('🚀 Starting curl mimic test...');
+                
+                // Test exactly like curl - same headers, same format
+                const response = await fetch('http://localhost:8080/api/bloom-filter/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': '*/*',
+                        'User-Agent': 'curl/8.7.1'
+                    },
+                    body: JSON.stringify({
+                        filter_name: 'curl_mimic_test',
+                        file_content: 'test',
+                        expected_elements: 100,
+                        false_positive_rate: 0.01
+                    })
+                });
+                
+                console.log('📥 Response received:', response.status);
+                const data = await response.json();
+                console.log('📊 Data:', data);
+                
+                resultDiv.innerHTML = `
+                    <h3>✅ Curl Mimic Test Successful!</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Message:</strong> ${data.message || 'No message'}</p>
+                `;
+                
+            } catch (error) {
+                console.error('❌ Curl mimic test failed:', error);
+                resultDiv.innerHTML = `
+                    <h3>❌ Curl Mimic Test Failed!</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p><strong>Type:</strong> ${error.name}</p>
+                    <p><strong>Stack:</strong> ${error.stack}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

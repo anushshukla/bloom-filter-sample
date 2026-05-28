@@ -1,0 +1,28 @@
+{
+  "name": "bloom-filter-frontend",
+  "version": "1.0.0",
+  "description": "Frontend application for Bloom Filter management with Redis backend",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 3000 -c-1",
+    "dev": "npx http-server . -p 3000 -c-1 --cors",
+    "build": "echo 'No build step required for static files'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "bloom-filter",
+    "redis",
+    "frontend",
+    "file-upload",
+    "search"
+  ],
+  "author": "AI Assistant",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Test</title>
+</head>
+<body>
+    <h1>Frontend API Test</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                console.log('🚀 Starting API test...');
+                
+                // Test 1: Simple GET request
+                console.log('📡 Testing GET /api/bloom-filter/list...');
+                const listResponse = await fetch('http://localhost:8080/api/bloom-filter/list');
+                console.log('📥 List response status:', listResponse.status);
+                const listData = await listResponse.json();
+                console.log('📊 List data:', listData);
+                
+                // Test 2: POST request
+                console.log('📡 Testing POST /api/bloom-filter/create...');
+                const createResponse = await fetch('http://localhost:8080/api/bloom-filter/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        filter_name: 'test_frontend',
+                        file_content: 'test',
+                        expected_elements: 100,
+                        false_positive_rate: 0.01
+                    })
+                });
+                console.log('📥 Create response status:', createResponse.status);
+                const createData = await createResponse.json();
+                console.log('📊 Create data:', createData);
+                
+                resultDiv.innerHTML = `
+                    <h3>✅ API Test Successful!</h3>
+                    <p><strong>List Response:</strong> ${listResponse.status} - ${listData.filters?.length || 0} filters</p>
+                    <p><strong>Create Response:</strong> ${createResponse.status} - ${createData.message || 'No message'}</p>
+                `;
+                
+            } catch (error) {
+                console.error('❌ API test failed:', error);
+                resultDiv.innerHTML = `
+                    <h3>❌ API Test Failed!</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

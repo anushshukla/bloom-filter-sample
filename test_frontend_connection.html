@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend-Backend Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .loading { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Frontend-Backend Connection Test</h1>
+    
+    <div>
+        <button onclick="testListEndpoint()">Test List Endpoint</button>
+        <button onclick="testCreateEndpoint()">Test Create Endpoint</button>
+        <button onclick="testAllEndpoints()">Test All Endpoints</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        
+        function addResult(message, type = 'loading') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testEndpoint(endpoint, method = 'GET', body = null) {
+            const url = `${API_BASE}${endpoint}`;
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            };
+            
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+            
+            try {
+                addResult(`🔄 Testing ${method} ${endpoint}...`, 'loading');
+                
+                const startTime = Date.now();
+                const response = await fetch(url, options);
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`
+                        ✅ <strong>${method} ${endpoint}</strong> - Success (${duration}ms)
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `, 'success');
+                } else {
+                    const errorText = await response.text();
+                    addResult(`
+                        ❌ <strong>${method} ${endpoint}</strong> - HTTP ${response.status} (${duration}ms)
+                        <pre>${errorText}</pre>
+                    `, 'error');
+                }
+            } catch (error) {
+                addResult(`
+                    ❌ <strong>${method} ${endpoint}</strong> - Network Error
+                    <pre>${error.message}</pre>
+                `, 'error');
+            }
+        }
+        
+        async function testListEndpoint() {
+            clearResults();
+            await testEndpoint('/bloom-filter/list');
+        }
+        
+        async function testCreateEndpoint() {
+            clearResults();
+            await testEndpoint('/bloom-filter/create', 'POST', {
+                filter_name: 'connection_test',
+                file_content: 'test\nconnection\nverification',
+                expected_elements: 100,
+                false_positive_rate: 0.01
+            });
+        }
+        
+        async function testAllEndpoints() {
+            clearResults();
+            addResult('🚀 Testing all endpoints...', 'loading');
+            
+            // Test list endpoint
+            await testEndpoint('/bloom-filter/list');
+            
+            // Test create endpoint
+            await testEndpoint('/bloom-filter/create', 'POST', {
+                filter_name: 'all_endpoints_test',
+                file_content: 'test\nall\nendpoints',
+                expected_elements: 50,
+                false_positive_rate: 0.01
+            });
+            
+            // Test search endpoint
+            await testEndpoint('/bloom-filter/all_endpoints_test/search', 'POST', {
+                element: 'test'
+            });
+            
+            addResult('🎯 All endpoint tests completed!', 'success');
+        }
+        
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            addResult('🌐 Page loaded. Click buttons above to test endpoints.', 'loading');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Frontend Test</title>
+</head>
+<body>
+    <h1>Simple Frontend API Test</h1>
+    <button onclick="testSimpleAPI()">Test Simple API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testSimpleAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                console.log('🚀 Starting simple API test...');
+                
+                // Test exactly like the main frontend
+                const response = await fetch('http://localhost:8080/api/bloom-filter/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        filter_name: 'simple_test',
+                        file_content: 'test',
+                        expected_elements: 100,
+                        false_positive_rate: 0.01
+                    })
+                });
+                
+                console.log('📥 Response received:', response.status);
+                const data = await response.json();
+                console.log('📊 Data:', data);
+                
+                resultDiv.innerHTML = `
+                    <h3>✅ Simple API Test Successful!</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Message:</strong> ${data.message || 'No message'}</p>
+                `;
+                
+            } catch (error) {
+                console.error('❌ Simple API test failed:', error);
+                resultDiv.innerHTML = `
+                    <h3>❌ Simple API Test Failed!</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p><strong>Type:</strong> ${error.name}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

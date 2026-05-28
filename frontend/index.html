@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloom Filter Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-filter"></i> Bloom Filter Manager</h1>
+            <p>Upload files and search using efficient bloom filters</p>
+        </header>
+
+        <main class="main-content">
+            <!-- File Upload Section -->
+            <section class="upload-section">
+                <h2><i class="fas fa-upload"></i> Upload File</h2>
+                <div class="upload-container">
+                    <div class="file-drop-zone" id="fileDropZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & drop your TXT/CSV file here</p>
+                        <p>or</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                            Choose File
+                        </button>
+                        <input type="file" id="fileInput" accept=".txt,.csv" style="display: none;">
+                    </div>
+                    
+                    <div class="upload-form" id="uploadForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="filterName">Filter Name:</label>
+                            <input type="text" id="filterName" placeholder="Enter a unique name for this filter" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expectedElements">Expected Elements:</label>
+                                <input type="number" id="expectedElements" value="10000" min="100" max="1000000">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="falsePositiveRate">False Positive Rate:</label>
+                                <input type="number" id="falsePositiveRate" value="0.01" min="0.001" max="0.1" step="0.001">
+                            </div>
+                        </div>
+                        
+                        <div class="file-info" id="fileInfo"></div>
+                        
+                        <button class="btn btn-success" onclick="createBloomFilter()">
+                            <i class="fas fa-save"></i> Create Bloom Filter
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Bloom Filter Info Display -->
+                <div class="bloom-filter-info" id="filterInfo"></div>
+            </section>
+
+            <!-- Bloom Filter Management Section -->
+            <section class="management-section">
+                <h2><i class="fas fa-cogs"></i> Bloom Filter Management</h2>
+                
+                <div class="filter-controls">
+                    <button class="btn btn-secondary" onclick="loadBloomFilters()">
+                        <i class="fas fa-sync"></i> Refresh Filters
+                    </button>
+                    <button class="btn btn-info" onclick="loadSelectedFilter()" id="loadFilterBtn" disabled>
+                        <i class="fas fa-download"></i> Load Selected Filter
+                    </button>
+                </div>
+                
+                <div class="filters-list" id="filtersList">
+                    <div class="loading-placeholder">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Click "Refresh Filters" to load available bloom filters</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search Section -->
+            <section class="search-section">
+                <h2><i class="fas fa-search"></i> Search in Bloom Filter</h2>
+                
+                <div class="search-container">
+                    <div class="current-filter-info" id="currentFilterInfo">
+                        <p>No filter loaded. Please load a bloom filter first.</p>
+                    </div>
+                    
+                    <div class="search-form" id="searchForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="searchTerm">Search Term:</label>
+                            <div class="search-input-group">
+                                <input type="text" id="searchTerm" placeholder="Enter the item to search for" required>
+                                <button class="btn btn-primary" onclick="searchInBloomFilter()">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="search-results" id="searchResults"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Status Messages -->
+        <div class="status-messages" id="statusMessages"></div>
+    </div>
+
+    <script src="binary_decoder.js?v=1"></script>
+    <script src="bloom_filter.js?v=2"></script>
+    <script src="script.js?v=2"></script>
+</body>
+</html> 

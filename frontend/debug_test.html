@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Fetch Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .loading { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .debug { background: #e2e3e5; border: 1px solid #d6d8db; color: #383d41; }
+    </style>
+</head>
+<body>
+    <h1>🐛 Debug Fetch Test</h1>
+    
+    <div>
+        <button onclick="testBasicFetch()">Test Basic Fetch</button>
+        <button onclick="testWithCORS()">Test With CORS</button>
+        <button onclick="testWithTimeout()">Test With Timeout</button>
+        <button onclick="testDirectAPI()">Test Direct API Call</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+        function addResult(message, type = 'loading') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        function addDebug(message) {
+            addResult(`🔍 ${message}`, 'debug');
+        }
+        
+        async function testBasicFetch() {
+            clearResults();
+            addResult('🔄 Testing basic fetch...', 'loading');
+            
+            try {
+                addDebug('Starting basic fetch to /api/bloom-filter/list');
+                const startTime = Date.now();
+                
+                const response = await fetch('http://localhost:8080/api/bloom-filter/list');
+                const endTime = Date.now();
+                
+                addDebug(`Response received in ${endTime - startTime}ms`);
+                addDebug(`Status: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`
+                        ✅ <strong>Basic Fetch Success</strong> (${endTime - startTime}ms)
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `, 'success');
+                } else {
+                    addResult(`
+                        ❌ <strong>Basic Fetch Failed</strong> - HTTP ${response.status}
+                    `, 'error');
+                }
+            } catch (error) {
+                addResult(`
+                    ❌ <strong>Basic Fetch Error</strong>
+                    <pre>${error.message}</pre>
+                    <pre>Type: ${error.name}</pre>
+                `, 'error');
+                console.error('Full error:', error);
+            }
+        }
+        
+        async function testWithCORS() {
+            clearResults();
+            addResult('🔄 Testing fetch with CORS options...', 'loading');
+            
+            try {
+                addDebug('Starting CORS fetch to /api/bloom-filter/list');
+                const startTime = Date.now();
+                
+                const response = await fetch('http://localhost:8080/api/bloom-filter/list', {
+                    mode: 'cors',
+                    credentials: 'omit',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                const endTime = Date.now();
+                
+                addDebug(`Response received in ${endTime - startTime}ms`);
+                addDebug(`Status: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`
+                        ✅ <strong>CORS Fetch Success</strong> (${endTime - startTime}ms)
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `, 'success');
+                } else {
+                    addResult(`
+                        ❌ <strong>CORS Fetch Failed</strong> - HTTP ${response.status}
+                    `, 'error');
+                }
+            } catch (error) {
+                addResult(`
+                    ❌ <strong>CORS Fetch Error</strong>
+                    <pre>${error.message}</pre>
+                    <pre>Type: ${error.name}</pre>
+                `, 'error');
+                console.error('Full error:', error);
+            }
+        }
+        
+        async function testWithTimeout() {
+            clearResults();
+            addResult('🔄 Testing fetch with timeout...', 'loading');
+            
+            try {
+                addDebug('Starting timeout fetch to /api/bloom-filter/list');
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    addDebug('⏰ Timeout triggered, aborting...');
+                    controller.abort();
+                }, 10000); // 10 second timeout
+                
+                const startTime = Date.now();
+                const response = await fetch('http://localhost:8080/api/bloom-filter/list', {
+                    mode: 'cors',
+                    signal: controller.signal
+                });
+                const endTime = Date.now();
+                
+                clearTimeout(timeoutId);
+                addDebug(`Response received in ${endTime - startTime}ms`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`
+                        ✅ <strong>Timeout Test Success</strong> (${endTime - startTime}ms)
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `, 'success');
+                } else {
+                    addResult(`
+                        ❌ <strong>Timeout Test Failed</strong> - HTTP ${response.status}
+                    `, 'error');
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    addResult(`
+                        ⏰ <strong>Request Aborted by Timeout</strong>
+                        <pre>${error.message}</pre>
+                    `, 'error');
+                } else {
+                    addResult(`
+                        ❌ <strong>Timeout Test Error</strong>
+                        <pre>${error.message}</pre>
+                        <pre>Type: ${error.name}</pre>
+                    `, 'error');
+                }
+                console.error('Full error:', error);
+            }
+        }
+        
+        async function testDirectAPI() {
+            clearResults();
+            addResult('🔄 Testing direct API call...', 'loading');
+            
+            try {
+                addDebug('Starting direct API call to create bloom filter');
+                const startTime = Date.now();
+                
+                const payload = {
+                    filter_name: 'debug_test',
+                    file_content: 'test\ndebug\napi',
+                    expected_elements: 100,
+                    false_positive_rate: 0.01
+                };
+                
+                addDebug(`Payload: ${JSON.stringify(payload)}`);
+                
+                const response = await fetch('http://localhost:8080/api/bloom-filter/create', {
+                    method: 'POST',
+                    mode: 'cors',
+                    credentials: 'omit',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const endTime = Date.now();
+                
+                addDebug(`Response received in ${endTime - startTime}ms`);
+                addDebug(`Status: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`
+                        ✅ <strong>Direct API Success</strong> (${endTime - startTime}ms)
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `, 'success');
+                } else {
+                    const errorText = await response.text();
+                    addResult(`
+                        ❌ <strong>Direct API Failed</strong> - HTTP ${response.status}
+                        <pre>${errorText}</pre>
+                    `, 'error');
+                }
+            } catch (error) {
+                addResult(`
+                    ❌ <strong>Direct API Error</strong>
+                    <pre>${error.message}</pre>
+                    <pre>Type: ${error.name}</pre>
+                `, 'error');
+                console.error('Full error:', error);
+            }
+        }
+        
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            addResult('🌐 Debug page loaded. Click buttons above to test different scenarios.', 'loading');
+            addResult('🔍 This page will help isolate where the fetch issue occurs.', 'debug');
+        });
+    </script>
+</body>
+</html>

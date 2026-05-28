@@ -1,0 +1,54 @@
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Redis / local runtime data
+dump.rdb
+*.rdb
+mock_filters_storage.json
+
+# Generated test artifacts
+test_report_*.txt
+
+# Deployment / platform
+.vercel/
+.railway/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Coverage / test caches
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
